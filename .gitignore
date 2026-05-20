@@ -1,0 +1,32 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Next.js (client/)
+client/node_modules/
+client/.next/
+client/out/
+client/build/
+client/.vercel
+
+# ChromaDB (from PLAN)
+brain/chroma_db/
+
+# OS & editors
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

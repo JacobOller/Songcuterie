@@ -1,0 +1,34 @@
+[project]
+name = "songcuterie"
+version = "0.1.0"
+description = "Vibe-based Spotify playlist generator"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115.0",
+    "authlib>=1.3.0",
+    "google-genai>=1.0.0",
+    "chromadb>=0.5.0",
+    "python-jose[cryptography]>=3.3.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["main.py"]
+
+[tool.fastapi]
+entrypoint = "server.main:app"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
