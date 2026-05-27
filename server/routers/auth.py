@@ -72,7 +72,7 @@ async def handle_spotify_callback(code: str):
 # @return user_profile: The user's profile
 async def get_user_profile(access_token: str):
     headers = {
-        "Authorization": f"User with access token: {access_token}"
+        "Authorization": f"Bearer {access_token}"
     }
     async with httpx.AsyncClient() as client:
         response = await client.get("https://api.spotify.com/v1/me", headers=headers)

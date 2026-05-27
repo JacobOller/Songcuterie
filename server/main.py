@@ -1,14 +1,27 @@
+import os
+
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from fastapi import Response, Request, HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-from routers.auth import build_spotify_auth_url, handle_spotify_callback, get_user_profile, handle_spotify_refresh
+from server.routers.auth import build_spotify_auth_url, handle_spotify_callback, get_user_profile, handle_spotify_refresh
 
 # Load environment variables
 load_dotenv()
 
 app = FastAPI()
+
+# CORS middleware, used to allow the frontend to make requests to the backend
+frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://127.0.0.1:3000")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[frontend_origin, "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Login endpoint
 # This endpoint builds the Spotify authorization URL and sets the OAuth state cookie
@@ -29,6 +42,7 @@ async def login(response: Response):
         httponly=True,
         samesite="lax",
     )
+    # Return the redirect response which sends the user to the Spotify authorization page
     return redirect
 
 
@@ -46,9 +60,29 @@ async def callback(request: Request, code: str, state: str):
     if not saved_state or state != saved_state:
         raise HTTPException(status_code=400, detail="Invalid state")
     # Exchange the authorization code for an access token and refresh token
-    access_token, refresh_token = handle_spotify_callback(code)
-    return {"access_token": access_token, "refresh_token": refresh_token}
-
+    token_data = await handle_spotify_callback(code)
+    frontend_url = os.getenv("FRONTEND_PROFILE_URL", "http://127.0.0.1:3000/profile")
+    redirect = RedirectResponse(url=frontend_url, status_code=302)
+    # Set the access token
+    redirect.set_cookie(
+        key="access_token",
+        value=token_data["access_token"],
+        secure=False, #TODO: Change to True in production
+        httponly=True,
+        samesite="lax",
+    )
+    # Set the refresh token
+    redirect.set_cookie(
+        key="refresh_token",
+        value=token_data["refresh_token"],
+        max_age=30 * 24 * 3600,
+        secure=False, #TODO: Change to True in production
+        httponly=True,
+        samesite="lax",
+    )
+    # Delete the OAuth state cookie
+    redirect.delete_cookie("oauth_state")
+    return redirect
 
 
 # Me endpoint

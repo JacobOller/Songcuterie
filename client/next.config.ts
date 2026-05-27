@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  // Allow HMR/dev resources when app is opened via 127.0.0.1.
+  allowedDevOrigins: ["127.0.0.1"],
 };
 
 export default nextConfig;
