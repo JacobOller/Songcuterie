@@ -7,12 +7,15 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.routers.auth import build_spotify_auth_url, handle_spotify_callback, get_user_profile, handle_spotify_refresh
+from server.routers import search
 from server.services.spotify_client import get_user_top_tracks
 
 # Load environment variables
 load_dotenv()
 
 app = FastAPI()
+
+app.include_router(search.router)
 
 # CORS middleware, used to allow the frontend to make requests to the backend
 frontend_origin = os.getenv("FRONTEND_ORIGIN", "http://127.0.0.1:3000")
