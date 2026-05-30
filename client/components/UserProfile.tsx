@@ -23,7 +23,7 @@ export default function UserProfile() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const res = await fetch(`${API_URL}/auth/me`, {
+        const res = await fetch(`${API_URL}/user/me`, {
           credentials: "include",
           cache: "no-store",
         });

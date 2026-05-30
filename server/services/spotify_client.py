@@ -1,5 +1,16 @@
 import httpx
 
+# Get the user's profile
+# @param access_token: The access token
+# @return user_profile: The user's profile
+async def get_user_profile(access_token: str):
+    headers = {
+        "Authorization": f"Bearer {access_token}"
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://api.spotify.com/v1/me", headers=headers)
+    return response.json()
+
 
 # Function to get the user's top tracks# @param access_token: The access token for the user
 # @param time_range: The time range for the top tracks (short_term is 4 weeks, medium_term is 6 months, long_term is all time)
