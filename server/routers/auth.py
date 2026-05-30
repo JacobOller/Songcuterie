@@ -2,19 +2,43 @@
 
 import os
 import secrets
+from urllib.parse import urlencode
+
 import httpx
 from fastapi import HTTPException
+
+# Scopes for current + planned PLAN.md features (re-login required after changes).
+SPOTIFY_SCOPES = " ".join(
+    [
+        "user-read-private",
+        "user-read-email",
+        "user-top-read",
+        "user-read-recently-played",
+        "playlist-modify-public",
+        "playlist-modify-private",
+    ]
+)
+
 
 # Build the Spotify authorization URL
 # @return auth_url: The Spotify authorization URL
 # @return state: The OAuth state
 def build_spotify_auth_url():
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
-    response_type = "code"
     redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
-    scope = "user-read-private user-read-email"
     state = secrets.token_hex(16)
-    auth_url = f"https://accounts.spotify.com/authorize?client_id={client_id}&response_type={response_type}&redirect_uri={redirect_uri}&scope={scope}&state={state}"
+    # Build the query string for the authorization URL
+    # Includes everything we need for the callback
+    query = urlencode(
+        {
+            "client_id": client_id,
+            "response_type": "code",
+            "redirect_uri": redirect_uri,
+            "scope": SPOTIFY_SCOPES,
+            "state": state,
+        }
+    )
+    auth_url = f"https://accounts.spotify.com/authorize?{query}"
     return auth_url, state
 
 # Handle the Spotify callback

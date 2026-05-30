@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TopTracks from "@/components/TopTracks";
 import UserProfile from "@/components/UserProfile";
 
 export default function ProfilePage() {
@@ -12,8 +13,14 @@ export default function ProfilePage() {
         </p>
       </header>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <h2 className="mb-4 text-lg font-medium">Profile</h2>
         <UserProfile />
+      </section>
+
+      <section className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <h2 className="mb-4 text-lg font-medium">Top Tracks</h2>
+        <TopTracks />
       </section>
 
       <footer>

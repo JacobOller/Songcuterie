@@ -252,72 +252,64 @@ CHROMA_PERSIST_DIR=./brain/chroma_db
 
 ## 9. Schedule & Milestones
 
-### Week 1 — Infrastructure (5/17 – 5/23)
-
-
-| Date     | Milestone                                                                                                                       |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 5/17 Sun | Spotify Developer Portal app created. FastAPI project initialized, server runs locally on `localhost:8000`.                     |
-| 5/18 Mon | Next.js project initialized with Tailwind. Basic layout scaffolded (nav, placeholder pages). Frontend runs on `localhost:3000`. |
-| 5/19 Tue | Spotify OAuth 2.0 implemented end-to-end — user can click "Login with Spotify" and be redirected back successfully.             |
-| 5/20 Wed | `/auth/me` endpoint works — frontend calls backend and displays logged-in user's Spotify display name and profile picture.      |
-| 5/21 Thu | `/user/top-tracks` and `/user/top-artists` endpoints complete. Data renders on a profile page in the frontend.                  |
-| 5/22 Fri | Buffer day — catch up, clean up code, write tests for auth and user endpoints.                                                  |
-| 5/23 Sat | **Week 1 complete.** Demo recording: log in with Spotify → see top artists and tracks on a webpage. Commit + push everything.   |
-
+### Week 1 — Infrastructure ✅ Complete
+- [x] Spotify Developer Portal app created
+- [x] FastAPI project initialized, running on `localhost:8000`
+- [x] Next.js project initialized with Tailwind, running on `localhost:3000`
+- [x] Folder structure scaffolded (`/client`, `/server`, `/brain`)
+- [x] Spotify OAuth 2.0 implemented end-to-end
+- [x] `/auth/me` endpoint — user profile displayed in frontend
+- [x] Top 20 tracks fetched and rendered
+- [x] Cookies storing and persisting user tokens
 
 ---
 
-### Week 2 — AI/Logic Engine (5/24 – 5/30)
-
-
-| Date     | Milestone                                                                                                                               |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| 5/24 Sun | Gemini 2.5 Flash API integrated in the `brain/` layer. Prompt template written: raw vibe text → structured JSON (audio feature params). |
-| 5/25 Mon | `/search/mood` endpoint wired up. Returns parsed audio params for a given vibe string. Debug view shows LLM output in the browser.      |
-| 5/26 Tue | Spotify audio features integrated — app can fetch `valence`, `energy`, `acousticness`, etc. for any track.                              |
-| 5/27 Wed | Basic recommendation logic working: LLM params → Spotify recommendations API → 10 tracks returned and rendered.                         |
-| 5/28 Thu | Personalization layer added: results filtered/re-ranked based on user's top artists and genres.                                         |
-| 5/29 Fri | Buffer day — edge case handling, error states, refine LLM prompt for accuracy.                                                          |
-| 5/30 Sat | **Week 2 complete.** Demo recording: type "late night drive" → see 10 personalized tracks returned. Commit + push.                      |
-
-
----
-
-### Week 3 — Search & Discovery (5/31 – 6/6)
-
-
-| Date     | Milestone                                                                                                   |
-| -------- | ----------------------------------------------------------------------------------------------------------- |
-| 5/31 Sun | ChromaDB set up locally. First batch of tracks embedded and stored.                                         |
-| 6/1 Mon  | ChromaDB query working — vibe params trigger a vector similarity search and return ranked results.          |
-| 6/2 Tue  | `/search/discover` endpoint built — surfaces new tracks outside the user's listening history.               |
-| 6/3 Wed  | Main UI built — playlist results page with album art, track name, artist, and 30-second preview.            |
-| 6/4 Thu  | Discovery UI built — "find me something new" flow works end-to-end.                                         |
-| 6/5 Fri  | Buffer day — UI polish, loading states, error handling, responsive layout.                                  |
-| 6/6 Sat  | **Week 3 complete.** Demo recording: full vibe query with ChromaDB + discovery flow working. Commit + push. |
-
+### Week 2 — AI/Logic Engine
+- [ ] Gemini 2.5 Flash integrated in `brain/`
+- [ ] Prompt template written: vibe text → structured JSON audio feature params
+- [ ] `/search/mood` endpoint built in `routers/search.py`
+- [ ] Debug view in browser showing raw LLM output (parsed params)
+- [ ] Spotify audio features integrated in `services/spotify_client.py`
+- [ ] Recommendation logic: LLM params → Spotify recommendations API → 10 tracks returned
+- [ ] 10 tracks rendered in frontend (rough UI is fine)
+- [ ] Personalization layer: results re-ranked against user's top artists/genres
+- [ ] Edge case handling — bad input, API failures, empty results
+- [ ] LLM prompt refined until results feel accurate
+- [ ] Tests written for `/search/mood`
+- [ ] **Demo:** type "late night drive" → see 10 personalized tracks. Commit + push.
 
 ---
 
-### Week 4 — Polish & Deploy (6/7 – 6/13)
+### Week 3 — Search & Discovery
+- [ ] ChromaDB installed and configured locally
+- [ ] Embedding strategy decided (see Section 6)
+- [ ] First batch of tracks embedded and stored in ChromaDB
+- [ ] ChromaDB query wired into `/search/mood` flow
+- [ ] `/search/discover` endpoint built — new tracks outside listening history
+- [ ] Main playlist UI — album art, track name, artist, 30s preview player
+- [ ] Discovery UI — "find me something new" flow works end-to-end
+- [ ] Loading states, empty states, error handling
+- [ ] Responsive layout pass
+- [ ] **Demo:** full vibe query + discovery flow working. Commit + push.
 
+---
 
-| Date     | Milestone                                                                                                              |
-| -------- | ---------------------------------------------------------------------------------------------------------------------- |
-| 6/7 Sun  | "Save to Spotify" feature complete — user can save a generated playlist directly to their Spotify account.             |
-| 6/8 Mon  | Full UI/UX pass — consistent styling, empty states, loading skeletons, mobile layout.                                  |
-| 6/9 Tue  | Backend deployed to Render. Environment variables configured. Smoke test all endpoints against production.             |
-| 6/10 Wed | Frontend deployed to Vercel. Connected to production backend. OAuth redirect URIs updated in Spotify Developer Portal. |
-| 6/11 Thu | End-to-end test on production — login → vibe query → playlist → save to Spotify. Fix any production-only bugs.         |
-| 6/12 Fri | Buffer day — final fixes, README written, code cleaned up.                                                             |
-| 6/13 Sat | **Project complete.** Final demo recording: full flow on production URL. Tag release on GitHub.                        |
-
+### Week 4 — Polish & Deploy
+- [ ] "Save to Spotify" — `/playlist/create` saves playlist to user's Spotify account
+- [ ] Full UI/UX pass — consistent styling, loading skeletons, mobile layout
+- [ ] README written — setup instructions, env vars, how to run locally
+- [ ] Backend deployed to Render, all env vars configured
+- [ ] Smoke test every endpoint against Render deployment
+- [ ] Frontend deployed to Vercel, connected to production backend
+- [ ] Spotify redirect URI updated to production URL in Developer Portal
+- [ ] Full end-to-end test on production — login → vibe → playlist → save
+- [ ] Debug logs and dead code removed
+- [ ] Tag release on GitHub
+- [ ] **Final demo on production URL. Project complete.**
 
 ---
 
 ### Working style
-
 - First block each session: no AI assist — focus on hard logic, reading docs, debugging API responses. Write down specific Cursor tasks for later.
 - Second block: Cursor ON for boilerplate, UI, repetitive patterns.
 - End of each session: review every AI-written line before committing. Descriptive commit messages.
@@ -343,4 +335,3 @@ CHROMA_PERSIST_DIR=./brain/chroma_db
 - [Next.js Docs](https://nextjs.org/docs)
 - [ChromaDB Docs](https://docs.trychroma.com/)
 - TODO: add OAuth tutorial link once you find a good one
-

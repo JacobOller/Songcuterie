@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from server.routers.auth import build_spotify_auth_url, handle_spotify_callback, get_user_profile, handle_spotify_refresh
+from server.services.spotify_client import get_user_top_tracks
 
 # Load environment variables
 load_dotenv()
@@ -130,3 +131,16 @@ async def refresh(request: Request, response: Response):
         samesite="lax",
     )
     return {"message": "Token refreshed"}
+
+
+# Top tracks endpoint
+# This endpoint returns the user's top tracks
+# @param request: The request object
+# @return top_tracks: A list of the user's top tracks
+@app.get("/user/top-tracks")
+async def top_tracks(request: Request):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    top_tracks = await get_user_top_tracks(access_token)
+    return top_tracks
