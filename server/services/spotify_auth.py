@@ -22,7 +22,7 @@ SPOTIFY_SCOPES = " ".join(
 # Function to build the Spotify authorization URL
 # @return auth_url: The Spotify authorization URL
 # @return state: The OAuth state
-async def build_spotify_auth_url():
+def build_spotify_auth_url():
     client_id = os.getenv("SPOTIFY_CLIENT_ID")
     redirect_uri = os.getenv("SPOTIFY_REDIRECT_URI")
     state = secrets.token_hex(16)
@@ -39,6 +39,7 @@ async def build_spotify_auth_url():
     )
     auth_url = f"https://accounts.spotify.com/authorize?{query}"
     return auth_url, state
+
 
 # Handle the Spotify callback
 # Builds token data, makes request to token URL, and returns the token data
