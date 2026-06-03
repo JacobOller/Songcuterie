@@ -33,6 +33,9 @@ def _load_valid_genre_seeds() -> frozenset[str]:
 
 _VALID_GENRE_SEEDS = _load_valid_genre_seeds()
 
+# Spotify Search API: limit min 1, max 10 per request
+_SEARCH_LIMIT_MAX = 10
+
 class RecommendationsUnavailable(Exception):
     """Spotify blocked /recommendations for this app (common for new dev apps since Nov 2024)."""
 
@@ -123,13 +126,17 @@ def _build_recommendation_query(
         if value is not None:
             query[spotify_key] = value
 
-    genre_seed = _pick_genre_seed(params.get("target_genres") or [])
-    if genre_seed:
-        query["seed_genres"] = genre_seed
+    # Max 5 seeds total — bias toward the user's top artists.
     if top_artist_ids:
-        query["seed_artists"] = ",".join(top_artist_ids[:2])
+        query["seed_artists"] = ",".join(top_artist_ids[:3])
     if top_track_ids:
-        query["seed_tracks"] = ",".join(top_track_ids[:2])
+        query["seed_tracks"] = ",".join(top_track_ids[:1])
+
+    seed_count = len(top_artist_ids[:3]) + len(top_track_ids[:1])
+    if seed_count < 5:
+        genre_seed = _pick_genre_seed(params.get("target_genres") or [])
+        if genre_seed:
+            query["seed_genres"] = genre_seed
 
     if not any(k in query for k in ("seed_genres", "seed_artists", "seed_tracks")):
         raise HTTPException(
@@ -180,6 +187,42 @@ async def get_user_top_tracks(
     return response.json()
 
 
+"""
+Function to get the user's top artists
+@param access_token: The access token
+@param limit: The number of top artists to return
+@return response.json(): The response from the Spotify API
+"""
+async def get_user_top_artists(
+    access_token: str, time_range: str = "medium_term", limit: int = 10
+) -> list[dict]:
+    response = await _spotify_get(
+        access_token,
+        "https://api.spotify.com/v1/me/top/artists",
+        params={"time_range": time_range, "limit": limit},
+    )
+    if response.status_code != 200:
+        _raise_spotify_error(response)
+
+    return [
+        {"id": item["id"], "name": item["name"]}
+        for item in response.json().get("items") or []
+        if item.get("id") and item.get("name")
+    ]
+
+
+async def _search_tracks(access_token: str, query: str, limit: int) -> list[dict]:
+    capped = min(max(1, limit), _SEARCH_LIMIT_MAX)
+    response = await _spotify_get(
+        access_token,
+        "https://api.spotify.com/v1/search",
+        params={"q": query, "type": "track", "limit": capped},
+    )
+    if response.status_code != 200:
+        _raise_spotify_error(response)
+    return response.json().get("tracks", {}).get("items", [])
+
+
 # Get the recommendations for the user
 # @param access_token: The access token
 # @param params: The parameters for the recommendations
@@ -221,16 +264,27 @@ async def search_tracks_for_mood(
     access_token: str,
     parsed_params: dict,
     raw_text: str,
+    top_artists: list[dict],
     limit: int = 10,
 ) -> list[dict]:
-    response = await _spotify_get(
-        access_token,
-        "https://api.spotify.com/v1/search",
-        params={"q": _mood_search_query(parsed_params, raw_text), "type": "track", "limit": limit},
-    )
+    """Search mood + user's top artists, then merge candidates for re-ranking."""
+    pool: list[dict] = []
+    mood_query = _mood_search_query(parsed_params, raw_text)
+    genre_seed = _pick_genre_seed(parsed_params.get("target_genres") or [])
 
-    if response.status_code != 200:
-        _raise_spotify_error(response)
+    if mood_query:
+        pool.extend(await _search_tracks(access_token, mood_query, 10))
 
-    data = response.json()
-    return data.get("tracks", {}).get("items", [])
+    for artist in top_artists[:4]:
+        name = artist["name"]
+        if genre_seed:
+            query = f'artist:"{name}" {genre_seed}'
+        else:
+            query = f'artist:"{name}"'
+        pool.extend(await _search_tracks(access_token, query, 10))
+
+    if not pool and top_artists:
+        names = " OR ".join(f'artist:"{a["name"]}"' for a in top_artists[:3])
+        pool.extend(await _search_tracks(access_token, names, 10))
+
+    return pool

@@ -1,3 +1,10 @@
+"""
+Router for the search endpoints
+
+Endpoints:
+- /search/mood: Search for music based on the mood provided by the user
+- /search/discover: Placeholder for Week 3 discovery flow
+"""
 import json
 
 import httpx
@@ -5,9 +12,11 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from server.services.mood_parser import parse_mood
+from server.services.personalization import build_taste_profile, personalize_tracks
 from server.services.spotify_client import (
     RecommendationsUnavailable,
     get_recommendations,
+    get_user_top_artists,
     get_user_top_tracks,
     search_tracks_for_mood,
 )
@@ -34,7 +43,7 @@ class MoodResponse(BaseModel):
 # @return artist_ids: The list of artist IDs
 # @return track_ids: The list of track IDs
 def _seed_ids_from_top_tracks(top_tracks_data: dict) -> tuple[list[str], list[str]]:
-    """Up to 2 track IDs and 2 artist IDs for Spotify recommendation seeds."""
+    """Up to 1 track ID and 2 artist IDs from top tracks (artist seeds come from top artists)."""
     items = top_tracks_data.get("items") or []
     track_ids: list[str] = []
     artist_ids: list[str] = []
@@ -42,7 +51,7 @@ def _seed_ids_from_top_tracks(top_tracks_data: dict) -> tuple[list[str], list[st
 
     for item in items:
         track_id = item.get("id")
-        if track_id and len(track_ids) < 2:
+        if track_id and len(track_ids) < 1:
             track_ids.append(track_id)
 
         for artist in item.get("artists") or []:
@@ -51,7 +60,7 @@ def _seed_ids_from_top_tracks(top_tracks_data: dict) -> tuple[list[str], list[st
                 seen_artists.add(artist_id)
                 artist_ids.append(artist_id)
 
-        if len(track_ids) >= 2 and len(artist_ids) >= 2:
+        if len(track_ids) >= 1 and len(artist_ids) >= 2:
             break
 
     return artist_ids, track_ids
@@ -69,7 +78,29 @@ async def search_mood(body: MoodRequest, request: Request):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
     try:
-        parsed_params = await parse_mood(body.raw_text)
+        top_artists = await get_user_top_artists(access_token, limit=10)
+        top_data = await get_user_top_tracks(access_token, limit=20)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load listening profile: {exc}",
+        ) from exc
+
+    artist_names = [a["name"] for a in top_artists]
+    taste = build_taste_profile(top_artists, top_data)
+    top_artist_ids = [a["id"] for a in top_artists[:3]]
+    _, track_ids = _seed_ids_from_top_tracks(top_data)
+
+    if not top_artist_ids and not track_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="No top tracks or artists found. Listen on Spotify and try again.",
+        )
+
+    try:
+        parsed_params = await parse_mood(body.raw_text, artist_names)
     except json.JSONDecodeError as exc:
         raise HTTPException(
             status_code=502,
@@ -86,36 +117,31 @@ async def search_mood(body: MoodRequest, request: Request):
             detail=f"Failed to parse mood: {exc}",
         ) from exc
 
-    # Get the user's top tracks and seed IDs from them
     try:
-        top_data = await get_user_top_tracks(access_token, limit=10)
-        artist_ids, track_ids = _seed_ids_from_top_tracks(top_data)
-
-        if not artist_ids and not track_ids:
-            raise HTTPException(
-                status_code=400,
-                detail="No top tracks found to seed recommendations. Listen on Spotify and try again.",
-            )
-
         track_source = "recommendations"
         try:
             recommendations = await get_recommendations(
                 access_token,
                 parsed_params,
-                artist_ids,
+                top_artist_ids,
                 track_ids,
             )
-            tracks = recommendations.get("tracks") or []
+            candidates = recommendations.get("tracks") or []
         except RecommendationsUnavailable:
-            tracks = await search_tracks_for_mood(
-                access_token, parsed_params, body.raw_text
+            candidates = await search_tracks_for_mood(
+                access_token,
+                parsed_params,
+                body.raw_text,
+                top_artists,
             )
             track_source = "search"
+
+        tracks = personalize_tracks(candidates, taste, limit=10)
 
         if not tracks:
             raise HTTPException(
                 status_code=404,
-                detail="No tracks found for this mood. Try a different description.",
+                detail="No tracks matched your taste for this mood. Try a different description.",
             )
     except HTTPException:
         raise

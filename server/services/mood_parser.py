@@ -10,8 +10,9 @@ PROMPT_PATH = PROJECT_ROOT / "brain" / "prompts" / "mood_to_params.txt"
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
-async def parse_mood(vibe_text: str):
-    prompt = PROMPT_PATH.read_text(encoding="utf-8")
+async def parse_mood(vibe_text: str, top_artists: list[str]):
+    artist_block = ", ".join(top_artists) if top_artists else "none available"
+    prompt = PROMPT_PATH.read_text(encoding="utf-8").replace("{top_artists}", artist_block)
     model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
 
     response = client.models.generate_content(
