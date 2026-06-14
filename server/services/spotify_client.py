@@ -1,3 +1,21 @@
+"""
+Module for interacting with the Spotify API
+
+Functions:
+- _load_valid_genre_seeds: Load the valid genre seeds from the file
+- get_user_profile: Get the user's profile
+- get_user_top_tracks: Get the user's top tracks
+- get_user_top_artists: Get the user's top artists
+- get_recommendations: Get the recommendations for the user
+- search_tracks_for_mood: Search for tracks matching a mood
+- _spotify_get: Make a GET request to the Spotify API
+- _spotify_error_message: Get the error message from the Spotify API response
+- _raise_spotify_error: Raise an HTTP exception with the error message from the Spotify API response
+- _pick_genre_seed: Pick a genre seed from the list of genres
+- _build_recommendation_query: Build the recommendation query
+- _mood_search_query: Build the mood search query
+"""
+
 from pathlib import Path
 
 import httpx
@@ -221,6 +239,11 @@ async def _search_tracks(access_token: str, query: str, limit: int) -> list[dict
     if response.status_code != 200:
         _raise_spotify_error(response)
     return response.json().get("tracks", {}).get("items", [])
+
+
+async def search_tracks(access_token: str, query: str, limit: int = 10) -> list[dict]:
+    """Search Spotify for tracks matching a query string."""
+    return await _search_tracks(access_token, query, limit)
 
 
 # Get the recommendations for the user

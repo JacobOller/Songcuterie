@@ -1,3 +1,11 @@
+"""
+Router for the authentication endpoints
+Endpoints:
+- /auth/login: Login endpoint
+- /auth/callback: Callback endpoint
+- /auth/refresh: Refresh endpoint
+"""
+
 import os
 
 from fastapi import APIRouter, HTTPException, Request, Response

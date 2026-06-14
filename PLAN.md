@@ -253,63 +253,68 @@ CHROMA_PERSIST_DIR=./brain/chroma_db
 ## 9. Schedule & Milestones
 
 ### Week 1 — Infrastructure ✅ Complete
-- [x] Spotify Developer Portal app created
-- [x] FastAPI project initialized, running on `localhost:8000`
-- [x] Next.js project initialized with Tailwind, running on `localhost:3000`
-- [x] Folder structure scaffolded (`/client`, `/server`, `/brain`)
-- [x] Spotify OAuth 2.0 implemented end-to-end
-- [x] `/auth/me` endpoint — user profile displayed in frontend
-- [x] Top 20 tracks fetched and rendered
-- [x] Cookies storing and persisting user tokens
+
+- Spotify Developer Portal app created
+- FastAPI project initialized, running on `localhost:8000`
+- Next.js project initialized with Tailwind, running on `localhost:3000`
+- Folder structure scaffolded (`/client`, `/server`, `/brain`)
+- Spotify OAuth 2.0 implemented end-to-end
+- `/auth/me` endpoint — user profile displayed in frontend
+- Top 20 tracks fetched and rendered
+- Cookies storing and persisting user tokens
 
 ---
 
 ### Week 2 — AI/Logic Engine
-- [ ] Gemini 2.5 Flash integrated in `brain/`
-- [ ] Prompt template written: vibe text → structured JSON audio feature params
-- [ ] `/search/mood` endpoint built in `routers/search.py`
-- [ ] Debug view in browser showing raw LLM output (parsed params)
-- [ ] Spotify audio features integrated in `services/spotify_client.py`
-- [ ] Recommendation logic: LLM params → Spotify recommendations API → 10 tracks returned
-- [ ] 10 tracks rendered in frontend (rough UI is fine)
-- [ ] Personalization layer: results re-ranked against user's top artists/genres
-- [ ] Edge case handling — bad input, API failures, empty results
-- [ ] LLM prompt refined until results feel accurate
-- [ ] Tests written for `/search/mood`
-- [ ] **Demo:** type "late night drive" → see 10 personalized tracks. Commit + push.
+
+- Gemini 2.5 Flash integrated in `brain/`
+- Prompt template written: vibe text → structured JSON audio feature params
+- `/search/mood` endpoint built in `routers/search.py`
+- Debug view in browser showing raw LLM output (parsed params)
+- Spotify audio features integrated in `services/spotify_client.py`
+- Recommendation logic: LLM params → Spotify recommendations API → 10 tracks returned
+- 10 tracks rendered in frontend (rough UI is fine)
+- Personalization layer: results re-ranked against user's top artists/genres
+- Edge case handling — bad input, API failures, empty results
+- LLM prompt refined until results feel accurate
+- Tests written for `/search/mood`
+- **Demo:** type "late night drive" → see 10 personalized tracks. Commit + push.
 
 ---
 
 ### Week 3 — Search & Discovery
-- [ ] ChromaDB installed and configured locally
-- [ ] Embedding strategy decided (see Section 6)
-- [ ] First batch of tracks embedded and stored in ChromaDB
-- [ ] ChromaDB query wired into `/search/mood` flow
-- [ ] `/search/discover` endpoint built — new tracks outside listening history
-- [ ] Main playlist UI — album art, track name, artist, 30s preview player
-- [ ] Discovery UI — "find me something new" flow works end-to-end
-- [ ] Loading states, empty states, error handling
-- [ ] Responsive layout pass
-- [ ] **Demo:** full vibe query + discovery flow working. Commit + push.
+
+- ChromaDB installed and configured locally
+- Embedding strategy decided (see Section 6)
+- First batch of tracks embedded and stored in ChromaDB
+- ChromaDB query wired into `/search/mood` flow
+- `/search/discover` endpoint built — new tracks outside listening history
+- Main playlist UI — album art, track name, artist, 30s preview player
+- Discovery UI — "find me something new" flow works end-to-end
+- Loading states, empty states, error handling
+- Responsive layout pass
+- **Demo:** full vibe query + discovery flow working. Commit + push.
 
 ---
 
 ### Week 4 — Polish & Deploy
-- [ ] "Save to Spotify" — `/playlist/create` saves playlist to user's Spotify account
-- [ ] Full UI/UX pass — consistent styling, loading skeletons, mobile layout
-- [ ] README written — setup instructions, env vars, how to run locally
-- [ ] Backend deployed to Render, all env vars configured
-- [ ] Smoke test every endpoint against Render deployment
-- [ ] Frontend deployed to Vercel, connected to production backend
-- [ ] Spotify redirect URI updated to production URL in Developer Portal
-- [ ] Full end-to-end test on production — login → vibe → playlist → save
-- [ ] Debug logs and dead code removed
-- [ ] Tag release on GitHub
-- [ ] **Final demo on production URL. Project complete.**
+
+- "Save to Spotify" — `/playlist/create` saves playlist to user's Spotify account
+- Full UI/UX pass — consistent styling, loading skeletons, mobile layout
+- README written — setup instructions, env vars, how to run locally
+- Backend deployed to Render, all env vars configured
+- Smoke test every endpoint against Render deployment
+- Frontend deployed to Vercel, connected to production backend
+- Spotify redirect URI updated to production URL in Developer Portal
+- Full end-to-end test on production — login → vibe → playlist → save
+- Debug logs and dead code removed
+- Tag release on GitHub
+- **Final demo on production URL. Project complete.**
 
 ---
 
 ### Working style
+
 - First block each session: no AI assist — focus on hard logic, reading docs, debugging API responses. Write down specific Cursor tasks for later.
 - Second block: Cursor ON for boilerplate, UI, repetitive patterns.
 - End of each session: review every AI-written line before committing. Descriptive commit messages.
@@ -335,3 +340,4 @@ CHROMA_PERSIST_DIR=./brain/chroma_db
 - [Next.js Docs](https://nextjs.org/docs)
 - [ChromaDB Docs](https://docs.trychroma.com/)
 - TODO: add OAuth tutorial link once you find a good one
+

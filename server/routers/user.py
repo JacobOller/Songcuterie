@@ -1,3 +1,10 @@
+"""
+Router for the user endpoints
+Endpoints:
+- /user/me: Get the user's profile
+- /user/top-tracks: Get the user's top tracks
+"""
+
 from fastapi import APIRouter, HTTPException, Request
 
 from server.services.spotify_client import get_user_profile, get_user_top_tracks

@@ -1,4 +1,10 @@
-# File that handles the authentication of the user
+"""
+Module for handling the authentication of the user
+Functions:
+- build_spotify_auth_url: Build the Spotify authorization URL
+- handle_spotify_callback: Handle the Spotify callback
+- handle_spotify_refresh: Handle the Spotify refresh
+"""
 
 import os
 import secrets

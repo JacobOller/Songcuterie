@@ -17,10 +17,16 @@ export default function SearchPage() {
         <MoodSearchTest />
       </section>
 
-      <footer>
+      <footer className="flex flex-wrap gap-4 text-sm">
+        <Link
+          href="/discover"
+          className="text-zinc-700 underline underline-offset-4 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+        >
+          Discover
+        </Link>
         <Link
           href="/"
-          className="text-sm text-zinc-700 underline underline-offset-4 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+          className="text-zinc-700 underline underline-offset-4 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
         >
           Back to home
         </Link>

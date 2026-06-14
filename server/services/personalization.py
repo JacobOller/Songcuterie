@@ -1,4 +1,13 @@
-"""Re-rank and filter Spotify tracks using the user's listening profile."""
+"""
+Module for personalizing tracks based on the user's taste profile
+Functions:
+- build_taste_profile: Build a taste profile from Spotify top artists + top tracks payloads
+- _track_artist_ids: Get the artist IDs from a track
+- _primary_artist_id: Get the primary artist ID from a track
+- _score_track: Score a track based on the taste profile
+- _dedupe_tracks: Deduplicate tracks
+- personalize_tracks: Personalize tracks based on the user's taste profile
+"""
 
 from dataclasses import dataclass, field
 
